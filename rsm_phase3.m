@@ -1,0 +1,53 @@
+function [result,z,x,basicvars] = rsm_phase3(m,n,c,A,b,basicvars)
+% Solves a linear program using the Revised Simplex Method
+% Assumes standard computational form
+% Starts from the given initial basic feasible solution
+% Input:
+%   m,n       = number of constraints and variables
+%   c         = nx1 cost vector
+%   A         = mxn constraint matrix
+%   b         = mx1 rhs vector
+%   basicvars = 1xm vector of indices of basic variables
+% Output:
+%   result    = 1 if problem optimal, -1 if unbounded
+%   z         = objective function value
+%   x         = nx1 solution vector
+%   basicvars = 1xm vector of indices of basic variables
+
+% Initialise
+cB = c(:,basicvars);
+B = A(:,basicvars);
+xB = inv(B)*b;
+result = 0;
+
+% Do RSM iterations
+while result == 0
+    % Calculate reduced cost vector
+    red_cost_1 = c(1,:)'-(cB(1,:)'*inv(B))*A;
+    red_cost_2 = c(2,:)'-(cB(2,:)'*inv(B))*A;
+
+    % Find nonbasic entering variable
+    [s,~] = find_entering_variable_phase3(n,red_cost_1,red_cost_2,basicvars);
+    
+    if s > 0
+        % Calculate Binv*As
+        BinvAs = inv(B)*A(:,s);
+        
+        % Find basic leaving variable
+        [r,ratio] = find_leaving_variable_phase3(m,xB,BinvAs,B);
+        if r > 0
+            % Update basis representation          
+            [basicvars,cB,B,xB] = update(m,c,A,b,s,r,basicvars,cB,B,xB);
+
+        else
+            result = -1;  % unbounded
+        end
+    else % declare optimal
+        result = 1;  % optimal
+    end
+end
+
+x = zeros(n,1);
+x(basicvars) = xB;
+z = cB'*xB;
+
