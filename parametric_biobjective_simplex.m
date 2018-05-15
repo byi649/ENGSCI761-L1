@@ -1,4 +1,4 @@
-function [ result,X,Y,basis,lambdas,t ] = parametric_biobjective_simplex( m,n,C,A,b,basicvars )
+function [result, X, Y, basis, lambdas, t] = parametric_biobjective_simplex(m, n, C, A, b, basicvars)
 % Solves a linear program using the parametric biobjective simplex method
 % Assumes input in form
 %       min Cx
@@ -29,22 +29,27 @@ function [ result,X,Y,basis,lambdas,t ] = parametric_biobjective_simplex( m,n,C,
 % Phase I: construct initial feasible basis
 % omitted as we assume initial feasible basis is given.
 
+% Phase II: Find optimal solution of LP(1)
 C = C';
 
-% Phase II: Find optimal solution of LP(1)
-% TODO ...
-[success,z,x,basicvars] = rsm(m,n,C(:,1),A,b,basicvars);
+[success, ~, x, basicvars] = rsm(m, n, C(:,1), A, b, basicvars);
+if (success == -1)
+    result = -1;
+    return
+end
 
-% Initialise
-cB = C(basicvars, :);
+% Initialise phase III variables
+CB = C(basicvars,:);
 B = A(:,basicvars);
 xB = inv(B)*b;
 result = 0;
 
-lambdas = [1];
-X = [x];
-Y = [z;0];
-basis = [basicvars'];
+% Initialise output vectors
+lambdas = 1;
+X = x;
+z = CB' * xB;
+Y = z;
+basis = basicvars';
 
 % Phase III: biobjective simplex iterations
 % Do parametric simplex iterations ...
@@ -52,22 +57,22 @@ while result == 0
     % while the optimal solution of LP(0) has not been found ... 
 
     % Calculate reduced cost vector
-    red_cost_1 = C(:,1)'-cB(:,1)'*(inv(B)*A);
-    red_cost_2 = C(:,2)'-cB(:,2)'*(inv(B)*A);
+    red_cost_1 = C(:,1)' - CB(:,1)' * (inv(B) * A);
+    red_cost_2 = C(:,2)' - CB(:,2)' * (inv(B) * A);
 
     % identify entering variable s and lambda ...
-    [s,lambda] = find_entering_variable_phase3(n,red_cost_1,red_cost_2,basicvars);
+    [s, lambda] = find_entering_variable_phase3(n, red_cost_1, red_cost_2, basicvars);
     
     % identify leaving variable r ...
     if s > 0
         % Calculate Binv*As
-        BinvAs = inv(B)*A(:,s);
+        BinvAs = inv(B) * A(:,s);
         
         % Find basic leaving variable
-        [r,ratio] = find_leaving_variable_phase3(m,xB,BinvAs,B);
+        [r, ~] = find_leaving_variable_phase3(m, xB, BinvAs);
         if r > 0
             % Update basis representation          
-            [basicvars,cB,B,xB] = update_phase3(m,C,A,b,s,r,basicvars,cB,B,xB);
+            [basicvars, CB, B, xB] = update_phase3(C, A, b, s, r, basicvars, CB, B);
 
         else
             result = -1;  % unbounded
@@ -79,7 +84,7 @@ while result == 0
         x(basicvars) = xB;
         X = [X, x];
         
-        z = cB'*xB;
+        z = CB'*xB;
         Y = [Y, z];
         
     else % declare optimal
@@ -88,8 +93,8 @@ while result == 0
     
     lambdas = [lambdas, lambda];
 
-    
-    
 end
-t = length(lambdas);
+
+t = length(Y);
+
 end
