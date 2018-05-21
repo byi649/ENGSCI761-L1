@@ -28,8 +28,9 @@ result = 0;
 C_r = (C' - CB' * inv(B) * A)';
 
 nonbasicvars = setdiff(1:n, basicvars); % extract nonbasic variables
-R = C_r(nonbasicvars, :);
+R = C_r(nonbasicvars, :)';
 
+%%
 
 % Solve LP to find efficient entering variables
 [m, n] = size(R);
@@ -40,18 +41,21 @@ f = [zeros(m, 1); -1];
 % \lambda' * R >= 0
 A(1:n, 1:m) = -R';
 
-% \lambda' * r_1 = 0
+% \lambda' * r_j = 0
 Aeq = [R(:, 1)', 0];
 beq = 0;
 
 % \lambda_min <= lamda
-A(n+1:end, 1:m) = eye(m);
+A(n+1:end, 1:m) = -eye(m);
 A(n+1:end, m+1:end) = ones(m,1);
 
-% \lambda > 0
-A = [A; -ones(1, m), 0];
-b = [b; -1];
+% \lambda_min > 0
+lb = [zeros(m, 1); 1e-3];
 
-lb = zeros(m+1, 1);
-ub = [];
+% Bound problem
+ub = ones(m+1, 1);
+
 x = linprog(f, A, b, Aeq, beq, lb, ub);
+
+%% Feasible entering variables: 1, 2 -> x2, x5
+
