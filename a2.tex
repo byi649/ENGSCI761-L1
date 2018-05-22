@@ -1,0 +1,123 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper, total={6in, 9in}]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[usenames, dvipsnames]{color}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[nocomma]{optidef}
+\setlength{\headheight}{15.2pt}
+\pagestyle{fancy}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{10pt}
+\setlist[enumerate,1]{label=P \Roman*)}
+\setlist[enumerate,2]{label=(\arabic*)}
+\definecolor{LGray}{gray}{0.9}
+\definecolor{DGray}{gray}{0.4}
+\usepackage{inconsolata}
+\usepackage[T1]{fontenc}
+\lstset{language=Matlab, tabsize=2, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}, basicstyle=\linespread{0.7}\ttfamily, commentstyle=\color{DGray}} 
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+
+
+\begin{document}
+\title{ENGSCI761 A2}
+\author{Benjamin Yi}
+\rhead{Benjamin Yi - byi649 - 925302651}
+\lhead{ENGSCI761 A2}
+	
+\section*{Task 3}
+\begin{enumerate}
+\item 
+
+\begin{mini*}
+	{}{Cx}
+	{}{}
+	\addConstraint{Ax}{= b}
+	\addConstraint{x}{\geqq 0}
+\end{mini*}
+
+where:
+\begin{align*}
+	C &=
+	\begin{bmatrix}
+		-1 & -2 & 0 & 0 & 0 & 0 \\
+		-1 & 0 & 2 & 0 & 0 & 0 \\
+		1 & 0 & -1 & 0 & 0 & 0
+	\end{bmatrix} \\
+	A &= 
+	\begin{bmatrix}
+		1 & 1 & 0 & 1 & 0 & 0 \\
+		0 & 1 & 0 & 0 & 1 & 0 \\
+		1 & -1 & 1 & 0 & 0 & 1
+	\end{bmatrix} \\
+	b &=
+	\begin{bmatrix}
+		1 \\ 2 \\ 4
+	\end{bmatrix} \\
+	x &= 
+	\begin{bmatrix}
+		x_1 \\ x_2 \\ x_3 \\ x_4 \\ x_5 \\ x_6
+	\end{bmatrix}
+\end{align*}
+
+\item 
+Basis \(\mathcal{B}_1 = \{2, 5, 6\}\)
+\newpage
+\item
+\begin{enumerate}
+\item
+Reduced cost matrix and R (via MATLAB):
+\begin{align*}
+	\bar{C} &=
+	\begin{bmatrix}
+		1 & 0 & 0 & 2 & 0 & 0 \\
+		-1 & 0 & 2 & 0 & 0 & 0 \\
+		1 & 0 & -1 & 0 & 0 & 0
+	\end{bmatrix} \\
+	R &=
+	\begin{bmatrix}
+		1 & 0 & 2 \\
+		-1 & 2 & 0 \\
+		1 & -1 & 0 \\
+	\end{bmatrix}
+\end{align*}
+
+\item
+\begin{maxi*}
+	{}{\lambda_\text{min}}
+	{}{}
+	\addConstraint{\lambda^T r_j}{= 0}
+	\addConstraint{\lambda^T R}{\geqq 0}
+	\addConstraint{\lambda_\text{min}}{\leq \lambda_i\quad}{\forall \lambda_i \in \lambda}
+	\addConstraint{\lambda, \lambda_\text{min}}{> 0}
+\end{maxi*}
+This ensures a direction of travel that maintains optimality and is in the direction of an alternative optimum.
+
+\item
+Columns \(r_1, r_2\) are eligible to enter the basis. \(r_3\) returns an infeasible solution. This corresponds to \(x_1, x_3\) being efficient entering variables.
+
+\item 
+Feasible bases and solutions (via MATLAB):
+\begin{align*}
+	\mathcal{B}_1 &= \{2, 5, 6\} \\
+	\bar{x}_1 &= [0, 1, 0, 0, 1, 5]^T \\
+	\\
+	\mathcal{B}_2 &= \{1, 5, 6\} \\
+	\bar{x}_2 &= [1, 0, 0, 0, 2, 3]^T \\
+	\\
+	\mathcal{B}_3 &= \{2, 3, 5\} \\
+	\bar{x}_3 &= [0, 1, 5, 0, 1, 0]^T
+\end{align*}
+\end{enumerate}
+
+\end{enumerate}
+\end{document}
+

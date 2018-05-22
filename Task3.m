@@ -70,6 +70,7 @@ for i = [1, 3]
         % Check for feasibility
         if ( det(B) ~= 0 && sum( inv(B)*b > 0 ) == 3 )
             disp(basicvars_test);
+            disp(inv(B)*b);
         end
     end
 end
